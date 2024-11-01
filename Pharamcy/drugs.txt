@@ -1,0 +1,11 @@
+Name;Price;Quantity
+Aspirin;3.5;0
+Ibuprofen;5.75;27
+Paracetamol;4.25;49
+Amoxicillin;12.0;20
+Ciprofloxacin;15.0;15
+Metformin;8.25;60
+Simvastatin;7.4;40
+Omeprazole;6.5;25
+Losartan;9.0;35
+Atorvastatin;10.2;40
