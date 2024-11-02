@@ -7,6 +7,7 @@ public class PharmacyController {
     private static String password;
     private static boolean isLogged =false;
     public static void main(String[] args) {
+      
 
         int option,drugSelector;
         Scanner scan = new Scanner(System.in);

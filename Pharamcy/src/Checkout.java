@@ -64,9 +64,10 @@ public class Checkout {
         try{
             FileWriter file = new FileWriter("checkouts.txt",true);
             PrintWriter writeCheckout = new PrintWriter(file);
+            System.out.println("C H E C K  O U T");
             viewCart(username); // Display items in cart
             System.out.println("Total Cost: " + total);
-            System.out.println("Checkout Succeed");
+           
 
             // Update the cart file after checkout if updateCart is successful
             if (updateCart(username)){
@@ -76,6 +77,7 @@ public class Checkout {
                             checkoutList.get(i).getQuantity());
                 }
                 writeCheckout.close();
+                System.out.println("Checkout Succeed");
                 return true;
             } else {
                 return false;

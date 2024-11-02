@@ -1,0 +1,3 @@
+Haitham;MMM;2.0;6
+Haitham;Atorvastatin;10.2;2
+Haitham;Losartan;9.0;1
