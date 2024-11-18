@@ -24,10 +24,10 @@ public class PharmacyController {
 
                     option = scan.nextInt();
                     switch (option) {
-                        case 0 -> System.exit(0);
-                        case 1 -> new Register();
+                        case 0 : System.exit(0);
+                        case 1 : new Register();
 
-                        case 2 -> {
+                        case 2 : {
                             // this to prevent leading the newline after pressing on enter after reading the option
                             scan.nextLine();
                             System.out.print("Enter your username: ");
@@ -75,7 +75,7 @@ public class PharmacyController {
                             }
                         }
 
-                        default -> {
+                        default : {
                             System.out.println("Enter a valid option (1-4)");
 
                         }
