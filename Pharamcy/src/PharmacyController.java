@@ -1,4 +1,3 @@
-import java.io.PrintWriter;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -7,7 +6,7 @@ public class PharmacyController {
     private static String password;
     private static boolean isLogged =false;
     public static void main(String[] args) {
-      
+
 
         int option,drugSelector;
         Scanner scan = new Scanner(System.in);
@@ -57,7 +56,7 @@ public class PharmacyController {
                                         int itemToBuy = scan.nextInt();
                                         System.out.print("Enter the how many item to buy: ");
                                         int numToBuy = scan.nextInt();
-                                        if(order.placeOrder(username,itemToBuy,numToBuy))
+                                        if(order.placeOrder(username))
                                             System.out.println();
                                         else
                                             System.out.println("Failed to add the item to the cart");
@@ -85,7 +84,7 @@ public class PharmacyController {
 
                         }
                     }
-                } while (option != 0);
+                } while (true);
             } catch (InputMismatchException e) {
                 System.out.println("The option must be a number between (1-4)");
                 scan.nextLine(); //  this to clear the invalid input
