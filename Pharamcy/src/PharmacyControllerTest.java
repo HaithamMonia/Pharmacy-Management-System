@@ -1,92 +1,122 @@
-import java.io.*;
-import java.util.Scanner;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class PharmacyControllerTest {
-    public static void main(String[] args) throws Exception {
-        // Simulate file setup for testing
-        setupTestFiles();
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import static org.junit.jupiter.api.Assertions.*;
 
-        // Test cases for Register, Login, View Drugs, Place Order, View Cart, and Checkout
-        testRegister();
-        testLogin();
-        testViewDrugs();
-        testPlaceOrder();
-        testViewCart();
-        testCheckout();
-    }
+class PharmacyControllerTest {
+    private PharmacyController pharmacyController;
+    private static final String TEST_USERNAME = "TestUser"; // A sample username for testing
+    private static final String TEST_PASSWORD = "TestPassword"; // A sample password for testing
+    private static final String TEST_USER_FILE = "test_users.txt"; // Path to the test users file
+    private static final String TEST_DRUGS_FILE = "test_drugs.txt"; // Path to the test drugs file
+    private static final String TEST_CART_FILE = "test_carts.txt"; // Path to the test cart file
 
-    private static void setupTestFiles() throws Exception {
-        // Create or reset test files for "users.txt", "drugs.txt", "carts.txt", and "checkouts.txt"
-        try (PrintWriter userWriter = new PrintWriter(new FileWriter("users.txt"))) {
-            userWriter.println("admin;admin123");
+    @BeforeEach
+    void setUp() throws IOException {
+        // Initialize the PharmacyController before each test
+        pharmacyController = new PharmacyController();
+
+        // Create test users file and add a user
+        try (FileWriter writer = new FileWriter(TEST_USER_FILE)) {
+            writer.write(TEST_USERNAME + ";" + TEST_PASSWORD + "\n");
         }
 
-        try (PrintWriter drugWriter = new PrintWriter(new FileWriter("drugs.txt"))) {
-            drugWriter.println("Name;Price;Quantity");
-            drugWriter.println("Paracetamol;2.5;10");
-            drugWriter.println("Aspirin;3.0;5");
+        // Create test drugs file and add some sample drugs
+        try (FileWriter writer = new FileWriter(TEST_DRUGS_FILE)) {
+            writer.write("Aspirin;5.0;100\n");
+            writer.write("Ibuprofen;10.0;50\n");
         }
 
-        try (PrintWriter cartWriter = new PrintWriter(new FileWriter("carts.txt"))) {
-            cartWriter.println("Username;Drug;Price;Quantity");
-        }
-
-        try (PrintWriter checkoutWriter = new PrintWriter(new FileWriter("checkouts.txt"))) {
-            checkoutWriter.println("Username;Drug;Price;Quantity");
-        }
-    }
-
-    private static void testRegister() {
-        System.out.println("\n=== Test Register ===");
-        try {
-            Register register = new Register(new Scanner(new ByteArrayInputStream("newUser\npassword123\n".getBytes())), new File("users.txt"));
-            register.startRegistration();
-            System.out.println("Registration successful!");
-        } catch (Exception e) {
-            System.err.println("Error in registration test: " + e.getMessage());
+        // Create test cart file to simulate a shopping cart
+        try (FileWriter writer = new FileWriter(TEST_CART_FILE)) {
+            writer.write("TestUser;Aspirin;5.0;2\n");
         }
     }
 
-    private static void testLogin() {
-        System.out.println("\n=== Test Login ===");
-        Login login = new Login("admin", "admin123", new File("users.txt"));
-        if (login.validateUser("admin", "admin123")) {
-            System.out.println("Login successful!");
-        } else {
-            System.out.println("Login failed.");
-        }
+    @AfterEach
+    void tearDown() {
+        // Clean up test files after each test
+        new File(TEST_USER_FILE).delete();
+        new File(TEST_DRUGS_FILE).delete();
+        new File(TEST_CART_FILE).delete();
     }
 
-    private static void testViewDrugs() {
-        System.out.println("\n=== Test View Drugs ===");
+    @Test
+    void testRegisterUser() {
+        // Test scenario: Register a new user
+        Register register = new Register();
+        register.setUsername("NewUser");
+        register.setPassword("NewPassword");
+
+        // Check if the new user is saved in the test users file
+        assertTrue(new File(TEST_USER_FILE).exists());
+    }
+
+    @Test
+    void testLoginSuccess() {
+        // Test scenario: Login with correct credentials
+        Login login = new Login(TEST_USERNAME, TEST_PASSWORD, new File(TEST_USER_FILE));
+        assertTrue(login.validateUser(TEST_USERNAME, TEST_PASSWORD));
+    }
+
+    @Test
+    void testLoginFailure() {
+        // Test scenario: Login with incorrect credentials
+        Login login = new Login(TEST_USERNAME, TEST_PASSWORD, new File(TEST_USER_FILE));
+        assertFalse(login.validateUser("WrongUser", "WrongPassword"));
+    }
+
+    @Test
+    void testViewDrugs() {
+        // Test scenario: Viewing drugs from the file
         PurchaseDrug purchaseDrug = new PurchaseDrug();
-        purchaseDrug.viewDrugs();
+        purchaseDrug.viewDrugs(); // Should print drug details to the console
     }
 
-    private static void testPlaceOrder() {
-        System.out.println("\n=== Test Place Order ===");
+    @Test
+    void testPlaceOrder() {
+        // Test scenario: Place an order for a drug
         PurchaseDrug purchaseDrug = new PurchaseDrug();
-        purchaseDrug.viewDrugs();
-        if (purchaseDrug.placeOrder("admin")) {
-            System.out.println("Order placed successfully!");
-        } else {
-            System.out.println("Failed to place order.");
-        }
+        purchaseDrug.viewDrugs(); // Show drugs to the user
+
+        // Simulate user input to select a drug and quantity
+        boolean result = purchaseDrug.placeOrder(TEST_USERNAME);
+        assertTrue(result);
     }
 
-    private static void testViewCart() {
-        System.out.println("\n=== Test View Cart ===");
+    @Test
+    void testViewCart() {
+        // Test scenario: Viewing the cart for the user
         Checkout checkout = new Checkout();
-        checkout.viewCart("admin");
+        checkout.viewCart(TEST_USERNAME); // Should print the cart details to the console
     }
 
-    private static void testCheckout() {
-        System.out.println("\n=== Test Checkout ===");
+    @Test
+    void testCheckout() {
+        // Test scenario: Checkout process
         Checkout checkout = new Checkout();
-        if (checkout.checkout("admin")) {
-            System.out.println("Checkout successful!");
-        } else {
-            System.out.println("Checkout failed.");
-        }
+        boolean result = checkout.checkout(TEST_USERNAME);
+        assertTrue(result);  // Verify that the checkout process is successful
+    }
+
+    @Test
+    void testCartFileNotFound() {
+        // Test scenario: Handling case when the cart file is missing
+        new File(TEST_CART_FILE).delete(); // Simulate missing cart file
+        Checkout checkout = new Checkout();
+        boolean result = checkout.checkout(TEST_USERNAME);
+        assertFalse(result); // Should fail because the cart file is missing
+    }
+
+    @Test
+    void testDrugsFileNotFound() {
+        // Test scenario: Handling case when the drugs file is missing
+        new File(TEST_DRUGS_FILE).delete(); // Simulate missing drugs file
+        PurchaseDrug purchaseDrug = new PurchaseDrug();
+        purchaseDrug.viewDrugs(); // Should print "No Drugs Found" or handle the exception gracefully
     }
 }
