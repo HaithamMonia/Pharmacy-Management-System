@@ -8,8 +8,8 @@ public class PurchaseDrug {
     private String drugName;
     private double price;
     private int availableStuck;
-    private Scanner scan = new Scanner(System.in);
-    private ArrayList<Drug> drugsAvailableList;
+    public Scanner scan = new Scanner(System.in);
+    public ArrayList<Drug> drugsAvailableList;
 
     // This method displays available drugs in the pharmacy by reading from "drugs.txt"
     public void viewDrugs() {
@@ -103,7 +103,7 @@ public class PurchaseDrug {
     }
 
     // Adds the selected drug to the cart file "carts.txt"
-    private boolean addToCart(String username, String name, double price, int qty) {
+    public boolean addToCart(String username, String name, double price, int qty) {
         try {
             FileWriter file = new FileWriter("carts.txt", true);
             PrintWriter write = new PrintWriter(file);
@@ -118,7 +118,7 @@ public class PurchaseDrug {
     }
 
     // Updates the drug inventory by writing updated quantities to "drugs.txt"
-    private boolean updateInventory(ArrayList<Drug> drugs) {
+    public boolean updateInventory(ArrayList<Drug> drugs) {
         try {
             PrintWriter write = new PrintWriter("drugs.txt");
             write.println("Name;Price;Quantity");  // Header line
