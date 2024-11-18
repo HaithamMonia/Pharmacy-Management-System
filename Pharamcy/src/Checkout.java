@@ -4,39 +4,60 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Represents a checkout system for an online pharmacy.
+ * Handles cart management and checkout processes.
+ */
 public class Checkout {
     private String drugName;
     private double price;
     private int quantity;
-    private double total=0;
-
+    private double total = 0;
     private Scanner scan;
     private ArrayList<Drug> checkoutList;
     private ArrayList<String> allCartContent;
 
-    public void viewCart(String username){
+    private String cartFile;     // File path for the cart
+    private String checkoutFile; // File path for the checkout records
+
+    // Constructor to initialize the file paths
+    public Checkout(String cartFile, String checkoutFile) {
+        this.cartFile = cartFile;
+        this.checkoutFile = checkoutFile;
+    }
+    // default constructor
+    public Checkout(){
+        this.cartFile = "cart.txt";
+        this.checkoutFile = "checkout.txt";
+    }
+
+    /**
+     * Displays the items in the user's cart.
+     * @param username the username whose cart is to be viewed
+     */
+    public void viewCart(String username) {
         System.out.println("\nThe Cart");
-        checkoutList = new ArrayList<Drug>();
+        checkoutList = new ArrayList<>();
         try {
-            scan = new Scanner(new File("carts.txt"));
-            if(!scan.hasNextLine()){
+            scan = new Scanner(new File(cartFile)); // Open the cart file for reading
+            if (!scan.hasNextLine()) {
                 System.out.println("No items in the cart");
                 return;
             }
-            scan.nextLine(); // to skip the header line of the file
+            scan.nextLine(); // Skip the header line
             String[] drug;
             int lineNum = 1;
 
-            while(scan.hasNextLine()){
+            while (scan.hasNextLine()) {
                 String line = scan.nextLine();
-                drug = line.split(";"); // split line into an array of drug properties
+                drug = line.split(";"); // Split line into an array of drug properties
 
                 // Check if the username matches the one passed as argument
-                if(drug[0].equalsIgnoreCase(username)){
+                if (drug[0].equalsIgnoreCase(username)) {
                     drugName = drug[1];
                     price = Double.parseDouble(drug[2]);
                     quantity = Integer.parseInt(drug[3]);
-                    total += price * quantity; // update total with cost of this drug
+                    total += price * quantity; // Update total with the cost of this drug
 
                     // Add the drug to the checkout list
                     checkoutList.add(new Drug(drugName, price, quantity));
@@ -46,84 +67,96 @@ public class Checkout {
                     lineNum++;
                 }
             }
-            System.out.println("Total: "+total);
-            if(lineNum == 1){
+            System.out.println("Total: " + total);
+            if (lineNum == 1) {
                 System.out.println("No items in your cart"); // Display if the cart is empty
             }
             System.out.println();
 
             scan.close();
 
-        }catch(Exception e){
-            System.out.println("ERROR: Opening the cart. Try again.."); // Error message in case of issues reading the cart file
+        } catch (Exception e) {
+            System.out.println("ERROR: Opening the cart. Try again."); // Error handling
         }
     }
 
-    // checkout method to process the items in the user's cart and write them to checkout file
-    public boolean checkout(String username){
-        try{
-            FileWriter file = new FileWriter("checkouts.txt",true);
+    /**
+     * Processes the user's checkout and updates the checkout file.
+     * @param username the username performing the checkout
+     * @return true if checkout succeeds, false otherwise
+     */
+    public boolean checkout(String username) {
+        try {
+            FileWriter file = new FileWriter(checkoutFile, true);
             PrintWriter writeCheckout = new PrintWriter(file);
             System.out.println("C H E C K  O U T");
             viewCart(username); // Display items in cart
             System.out.println("Total Cost: " + total);
-           
 
             // Update the cart file after checkout if updateCart is successful
-            if (updateCart(username)){
-                for(int i = 0; i < checkoutList.size(); i++){
-                    writeCheckout.println(username + ";" + checkoutList.get(i).getName() + ";" +
-                            checkoutList.get(i).getPrice() + ";" +
-                            checkoutList.get(i).getQuantity());
+            if (updateCart(username)) {
+                for (Drug drug : checkoutList) {
+                    writeCheckout.println(username + ";" + drug.getName() + ";" +
+                            drug.getPrice() + ";" + drug.getQuantity());
                 }
                 writeCheckout.close();
-                System.out.println("Checkout Succeed");
+                System.out.println("Checkout Succeeded");
                 return true;
             } else {
                 return false;
             }
 
-        }catch(Exception e){
-            System.out.println("ERROR: Checkout Failed try again ..."); // Error in checkout process
+        } catch (Exception e) {
+            System.out.println("ERROR: Checkout Failed. Try again."); // Error handling
             return false;
         }
     }
 
-    // updateCart method to remove items from the cart file after successful checkout
-    private boolean updateCart(String username){
+    /**
+     * Updates the cart file to remove items after checkout.
+     * @param username the username whose cart is to be updated
+     * @return true if the cart is updated successfully, false otherwise
+     */
+    boolean updateCart(String username) {
         allCartContent = new ArrayList<>();
-        try{
-            scan = new Scanner(new File("carts.txt"));
-            PrintWriter writeCart = new PrintWriter("carts.txt");
+        try {
+            scan = new Scanner(new File(cartFile));
+            PrintWriter writeCart = new PrintWriter(cartFile);
             String[] drug;
             boolean toDelete = false;
 
-            // Read all content from cart file and store in allCartContent list
-            while(scan.hasNextLine()){
+            // Read all content from the cart file
+            while (scan.hasNextLine()) {
                 drug = scan.nextLine().split(";");
                 allCartContent.add(drug[0] + ";" + drug[1] + ";" + drug[2] + ";" + drug[3]);
             }
-            //we start updating the cart
-            writeCart.println("Username;Drug;Price;Quantity"); // Rewrite header in the cart file
 
-            // Iterate over all items in cart to update it, excluding items in checkout list
-            for(int i = 0; i < allCartContent.size(); i++){
-                String[] cartItem = allCartContent.get(i).split(";");
-                for(int j = 0; j < checkoutList.size(); j++){
-                    // Check if current cart item belongs to user being checked out
-                    if(cartItem[0].equalsIgnoreCase(username)){
+            // Rewrite header in the cart file
+            writeCart.println("Username;Drug;Price;Quantity");
+
+            // Update cart content, excluding checked-out items
+            for (String cartItem : allCartContent) {
+                String[] cartFields = cartItem.split(";");
+                toDelete = false;
+
+                for (Drug d : checkoutList) {
+                    // Check if current cart item belongs to the user being checked out
+                    if (cartFields[0].equalsIgnoreCase(username) &&
+                            cartFields[1].equalsIgnoreCase(d.getName())) {
                         toDelete = true;
+                        break;
                     }
                 }
-                if (toDelete){
-                    continue; // Skip adding item if it belongs to the user
+
+                if (!toDelete) {
+                    writeCart.println(cartItem); // Keep the item if not part of the checkout
                 }
-                writeCart.println(allCartContent.get(i));
             }
+
             writeCart.close();
 
-        }catch (Exception e){
-            System.out.println("ERROR: In the checkout..."); // Error message in case of issues updating the cart
+        } catch (Exception e) {
+            System.out.println("ERROR: In the checkout process."); // Error handling
             return false;
         }
         return true;
