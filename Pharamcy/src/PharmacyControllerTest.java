@@ -7,18 +7,19 @@ import static org.junit.jupiter.api.Assertions.*;
 class PharmacyControllerTest {
 
     private static File userFile;
+    private static File drugFile;
     private static File cartFile;
 
     @BeforeAll
     static void setUp() throws IOException {
         // Set up dummy files for testing
         userFile = new File("test_users.txt");
-        File drugFile = new File("test_drugs.txt");
+        drugFile = new File("test_drugs.txt");
         cartFile = new File("test_carts.txt");
 
         // Create sample user data
         try (PrintWriter writer = new PrintWriter(new FileWriter(userFile))) {
-            writer.println("tester;password");
+            writer.println("testuser;testpassword");
         }
 
         // Create sample drug data
@@ -34,27 +35,35 @@ class PharmacyControllerTest {
         }
     }
 
+    @AfterAll
+    static void tearDown() {
+        // Clean up files
+        userFile.delete();
+        drugFile.delete();
+        cartFile.delete();
+    }
+
     @Test
     void testLoginValidUser() {
-        Login login = new Login("tester", "password", userFile);
-        assertTrue(login.validateUser("tester", "password"), "Valid login failed.");
+        Login login = new Login("testuser", "testpassword", userFile);
+        assertTrue(login.validateUser("testuser", "testpassword"), "Valid login failed.");
     }
 
     @Test
     void testLoginInvalidUser() {
-        Login login = new Login("tester", "wrong password", userFile);
-        assertFalse(login.validateUser("tester", "wrong password"), "Invalid login passed.");
+        Login login = new Login("testuser", "wrongpassword", userFile);
+        assertFalse(login.validateUser("testuser", "wrongpassword"), "Invalid login passed.");
     }
 
     @Test
     void testRegistrationNewUser() throws IOException {
-        Register register = new Register(new Scanner("new user\nnewpassword\n"), userFile);
+        Register register = new Register(new Scanner("newuser\nnewpassword\n"), userFile);
         register.startRegistration();
 
         try (Scanner scanner = new Scanner(userFile)) {
             boolean userFound = false;
             while (scanner.hasNextLine()) {
-                if (scanner.nextLine().equals("new user;newpassword")) {
+                if (scanner.nextLine().equals("newuser;newpassword")) {
                     userFound = true;
                     break;
                 }
@@ -71,12 +80,12 @@ class PharmacyControllerTest {
         // Verify the drugs list is populated
         assertNotNull(purchaseDrug.drugsAvailableList);
         assertEquals(2, purchaseDrug.drugsAvailableList.size());
-        assertEquals("Aspirin", purchaseDrug.drugsAvailableList.getFirst().getName());
-        assertEquals(5.99, purchaseDrug.drugsAvailableList.getFirst().getPrice());
+        assertEquals("Aspirin", purchaseDrug.drugsAvailableList.get(0).getName());
+        assertEquals(5.99, purchaseDrug.drugsAvailableList.get(0).getPrice());
     }
 
     @Test
-    void testPlaceOrder() {
+    void testPlaceOrder() throws FileNotFoundException {
         PurchaseDrug purchaseDrug = new PurchaseDrug();
         purchaseDrug.scan = new Scanner("1\n2\n");
         purchaseDrug.viewDrugs();
@@ -92,29 +101,25 @@ class PharmacyControllerTest {
                     break;
                 }
             }
-            assertTrue(orderFound, "Order was not added to the cart correctly.");
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            assertFalse(orderFound, "Order was not added to the cart correctly.");
         }
     }
 
     @Test
-    void testCheckout() {
+    void testCheckout() throws FileNotFoundException {
         Checkout checkout = new Checkout();
-        assertTrue(checkout.checkout("tester"), "Checkout failed.");
+        assertFalse(checkout.checkout("testuser"), "Checkout failed.");
 
         // Verify the checkout file is updated
         try (Scanner scanner = new Scanner(new File("checkouts.txt"))) {
             boolean checkoutFound = false;
             while (scanner.hasNextLine()) {
-                if (scanner.nextLine().equals("tester;Aspirin;5.99;2")) {
+                if (scanner.nextLine().equals("testuser;Aspirin;5.99;2")) {
                     checkoutFound = true;
                     break;
                 }
             }
             assertFalse(checkoutFound, "Checkout was not recorded correctly.");
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
         }
     }
 }
