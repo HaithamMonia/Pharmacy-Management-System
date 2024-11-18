@@ -25,7 +25,7 @@ public class PharmacyController {
                     option = scan.nextInt();
                     switch (option) {
                         case 0 : System.exit(0);
-                        case 1 : new Register();
+                        case 1 : new Register().startRegistration();
 
                         case 2 : {
                             // this to prevent leading the newline after pressing on enter after reading the option
