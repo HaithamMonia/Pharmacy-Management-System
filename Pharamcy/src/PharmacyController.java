@@ -52,7 +52,12 @@ public class PharmacyController {
                                         new PurchaseDrug().viewDrugs();
                                     }else if(drugSelector ==2){
                                         PurchaseDrug order = new PurchaseDrug();
-                                        if(order.placeOrder(username))
+                                        order. viewDrugs();
+                                        System.out.print("Enter the Item you want to buy: ");
+                                        int itemToBuy = scan.nextInt();
+                                        System.out.print("Enter the how many item to buy: ");
+                                        int numToBuy = scan.nextInt();
+                                        if(order.placeOrder(username,itemToBuy,numToBuy))
                                             System.out.println();
                                         else
                                             System.out.println("Failed to add the item to the cart");
