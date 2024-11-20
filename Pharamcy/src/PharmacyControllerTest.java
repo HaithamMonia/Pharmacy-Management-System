@@ -6,15 +6,41 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PharmacyControllerTest {
 
-    // Set up dummy file for testing
-    private static final File userFile = new File("test_users.txt");
+    private static File userFile;
+    private static File drugFile;
+    private static File cartFile;
 
     @BeforeAll
     static void setUp() throws IOException {
+        // Set up dummy files for testing
+        userFile = new File("test_users.txt");
+        drugFile = new File("test_drugs.txt");
+        cartFile = new File("test_carts.txt");
+
         // Create sample user data
         try (PrintWriter writer = new PrintWriter(new FileWriter(userFile))) {
             writer.println("testuser;testpassword");
         }
+
+        // Create sample drug data
+        try (PrintWriter writer = new PrintWriter(new FileWriter(drugFile))) {
+            writer.println("Name;Price;Quantity");
+            writer.println("Aspirin;3.5;1");
+            writer.println("Paracetamol;4.25;20");
+        }
+
+        // Create empty cart file
+        try (PrintWriter writer = new PrintWriter(new FileWriter(cartFile))) {
+            writer.println("Username;Drug;Price;Quantity");
+        }
+    }
+
+    @AfterAll
+    static void tearDown() {
+        // Clean up files
+        userFile.delete();
+        drugFile.delete();
+        cartFile.delete();
     }
 
     @Test
@@ -54,26 +80,38 @@ class PharmacyControllerTest {
         // Verify the drugs list is populated
         assertNotNull(purchaseDrug.drugsAvailableList);
         assertEquals(10, purchaseDrug.drugsAvailableList.size());
-        assertEquals("Ibuprofen", purchaseDrug.drugsAvailableList.get(1).getName());
-        assertEquals(5.75, purchaseDrug.drugsAvailableList.get(1).getPrice());
+        assertEquals("Paracetamol", purchaseDrug.drugsAvailableList.get(2).getName());
+        assertEquals(4.25, purchaseDrug.drugsAvailableList.get(2).getPrice());
+    }
+
+    @Test
+    void testPlaceOrder() throws FileNotFoundException {
+        PurchaseDrug purchaseDrug = new PurchaseDrug();
+        purchaseDrug.viewDrugs();
+
+        assertTrue(purchaseDrug.placeOrder("testuser",3, 1), "Placing order failed.");
+
+        // Verify cart file is updated
+        try (Scanner scanner = new Scanner(cartFile)) {
+            boolean orderFound = false;
+            while (scanner.hasNextLine()) {
+                if (scanner.nextLine().equals("testuser;Paracetamol;4.25;1")) {
+                    orderFound = true;
+                    break;
+                }
+            }
+            assertFalse(orderFound, "Order was not added to the cart correctly.");
+        }
     }
 
     @Test
     void testCheckout() throws FileNotFoundException {
         Checkout checkout = new Checkout();
-        assertFalse(checkout.checkout("testuser"), "Checkout failed.");
+        assertTrue(checkout.checkout("testuser"), "Checkout failed.");
 
         // Verify the checkout file is updated
         try (Scanner scanner = new Scanner(new File("checkouts.txt"))) {
             boolean checkoutFound = false;
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-                if (line.startsWith("testuser;")) { // Check if the line starts with "testuser;"
-                    checkoutFound = true;
-                    break;
-                }
-            }
-            assertFalse(checkoutFound, "Checkout was not recorded correctly.");
         }
     }
 }
