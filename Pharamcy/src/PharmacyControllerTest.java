@@ -6,41 +6,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PharmacyControllerTest {
 
-    private static File userFile;
-    private static File drugFile;
-    private static File cartFile;
+    // Set up dummy file for testing
+    private static File userFile = new File("test_users.txt");
 
     @BeforeAll
     static void setUp() throws IOException {
-        // Set up dummy files for testing
-        userFile = new File("test_users.txt");
-        drugFile = new File("test_drugs.txt");
-        cartFile = new File("test_carts.txt");
-
         // Create sample user data
         try (PrintWriter writer = new PrintWriter(new FileWriter(userFile))) {
             writer.println("testuser;testpassword");
         }
-
-        // Create sample drug data
-        try (PrintWriter writer = new PrintWriter(new FileWriter(drugFile))) {
-            writer.println("Name;Price;Quantity");
-            writer.println("Aspirin;5.99;10");
-            writer.println("Paracetamol;4.99;20");
-        }
-
-        // Create empty cart file
-        try (PrintWriter writer = new PrintWriter(new FileWriter(cartFile))) {
-            writer.println("Username;Drug;Price;Quantity");
-        }
-    }
-
-    @AfterAll
-    static void tearDown() {
-        // Clean up files
-        userFile.delete();
-        drugFile.delete();
-        cartFile.delete();
     }
 
     @Test
@@ -83,7 +57,6 @@ class PharmacyControllerTest {
         assertEquals("Aspirin", purchaseDrug.drugsAvailableList.get(0).getName());
         assertEquals(3.5, purchaseDrug.drugsAvailableList.get(0).getPrice());
     }
-
 
     @Test
     void testCheckout() throws FileNotFoundException {
