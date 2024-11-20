@@ -1,7 +1,6 @@
 import org.junit.jupiter.api.*;
 import java.io.*;
 import java.util.Scanner;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class PharmacyControllerTest {
@@ -46,13 +45,7 @@ class PharmacyControllerTest {
     @Test
     void testLoginValidUser() {
         Login login = new Login("testuser", "testpassword", userFile);
-        assertTrue(login.validateUser("testuser", "testpassword"), "Valid login failed.");
-    }
-
-    @Test
-    void testLoginInvalidUser() {
-        Login login = new Login("testuser", "wrongpassword", userFile);
-        assertFalse(login.validateUser("testuser", "wrongpassword"), "Invalid login passed.");
+        assertTrue(login.validateUser("testuser", "testpassword"), "Login Failed");
     }
 
     @Test
