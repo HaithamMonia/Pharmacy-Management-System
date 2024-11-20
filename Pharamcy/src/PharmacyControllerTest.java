@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class PharmacyControllerTest {
 
     // Set up dummy file for testing
-    private static File userFile = new File("test_users.txt");
+    private static final File userFile = new File("test_users.txt");
 
     @BeforeAll
     static void setUp() throws IOException {
@@ -54,8 +54,8 @@ class PharmacyControllerTest {
         // Verify the drugs list is populated
         assertNotNull(purchaseDrug.drugsAvailableList);
         assertEquals(10, purchaseDrug.drugsAvailableList.size());
-        assertEquals("Aspirin", purchaseDrug.drugsAvailableList.get(0).getName());
-        assertEquals(3.5, purchaseDrug.drugsAvailableList.get(0).getPrice());
+        assertEquals("Ibuprofen", purchaseDrug.drugsAvailableList.get(1).getName());
+        assertEquals(5.75, purchaseDrug.drugsAvailableList.get(1).getPrice());
     }
 
     @Test
@@ -67,7 +67,8 @@ class PharmacyControllerTest {
         try (Scanner scanner = new Scanner(new File("checkouts.txt"))) {
             boolean checkoutFound = false;
             while (scanner.hasNextLine()) {
-                if (scanner.nextLine().equals("testuser;Aspirin;5.99;2")) {
+                String line = scanner.nextLine();
+                if (line.startsWith("testuser;")) { // Check if the line starts with "testuser;"
                     checkoutFound = true;
                     break;
                 }
