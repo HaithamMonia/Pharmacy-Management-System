@@ -61,7 +61,6 @@ public class PharmacyController {
                                             System.out.println();
                                         else
                                             System.out.println("Failed to add the item to the cart");
-//                                        new PurchaseDrug().viewDrugs();
                                     }
                                     if (drugSelector== 3){
                                         if(isLogged){
@@ -74,7 +73,6 @@ public class PharmacyController {
                                         checkout.checkout(username);
                                     }
                                 } while (drugSelector != 0);
-
                             } else {
                                 System.out.println("Wrong username or password!");
                             }
