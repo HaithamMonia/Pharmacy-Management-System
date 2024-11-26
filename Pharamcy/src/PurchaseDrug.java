@@ -46,46 +46,7 @@ public class PurchaseDrug {
         }
     }
 
-    // This method places an order for a drug and updates inventory
-    public boolean placeOrder(String username, int option, int numElementToBuy) {
-        // Display available drugs
-        try {
-            if (option <= 0 || option > drugsAvailableList.size()) {
-                System.out.println("Invalid option selected.");
-                return false;
-            }
-
-            Drug selectedDrug = drugsAvailableList.get(option - 1);
-            if (selectedDrug.getQuantity() == 0) {
-                System.out.println("Sorry, " + selectedDrug.getName() + " is out of stock.");
-                return false;
-            }
-
-            if (numElementToBuy <= 0 || numElementToBuy > selectedDrug.getQuantity()) {
-                System.out.println("Invalid quantity. Available stock is " + selectedDrug.getQuantity());
-                return false;
-            }
-
-            // Add drug to the cart
-            if (addToCart(username, selectedDrug.getName(), selectedDrug.getPrice(), numElementToBuy)) {
-                selectedDrug.setQuantity(selectedDrug.getQuantity() - numElementToBuy);
-                // Update inventory
-                if (updateInventory()) {
-                    System.out.println(selectedDrug.getName() + " has been added successfully to your cart");
-                    return true;
-                } else {
-                    System.out.println("Failed to update inventory. Please try again.");
-                    return false;
-                }
-            } else {
-                System.out.println("Failed to add the item to the cart.");
-                return false;
-            }
-        } catch (Exception e) {
-            System.out.println("ERROR: Failed to place the order - " + e.getMessage());
-            return false;
-        }
-    }
+ 
 
     // Adds the selected drug to the cart file
     public boolean addToCart(String username, String name, double price, int qty) {
@@ -98,7 +59,46 @@ public class PurchaseDrug {
             return false;
         }
     }
+   // This method places an order for a drug and updates inventory
+   public boolean placeOrder(String username, int option, int numElementToBuy) {
+    // Display available drugs
+    try {
+        if (option <= 0 || option > drugsAvailableList.size()) {
+            System.out.println("Invalid option selected.");
+            return false;
+        }
 
+        Drug selectedDrug = drugsAvailableList.get(option - 1);
+        if (selectedDrug.getQuantity() == 0) {
+            System.out.println("Sorry, " + selectedDrug.getName() + " is out of stock.");
+            return false;
+        }
+
+        if (numElementToBuy <= 0 || numElementToBuy > selectedDrug.getQuantity()) {
+            System.out.println("Invalid quantity. Available stock is " + selectedDrug.getQuantity());
+            return false;
+        }
+
+        // Add drug to the cart
+        if (addToCart(username, selectedDrug.getName(), selectedDrug.getPrice(), numElementToBuy)) {
+            selectedDrug.setQuantity(selectedDrug.getQuantity() - numElementToBuy);
+            // Update inventory
+            if (updateInventory()) {
+                System.out.println(selectedDrug.getName() + " has been added successfully to your cart");
+                return true;
+            } else {
+                System.out.println("Failed to update inventory. Please try again.");
+                return false;
+            }
+        } else {
+            System.out.println("Failed to add the item to the cart.");
+            return false;
+        }
+    } catch (Exception e) {
+        System.out.println("ERROR: Failed to place the order - " + e.getMessage());
+        return false;
+    }
+}
     // Updates the drug inventory by writing updated quantities to the file
     public boolean updateInventory() {
         try (PrintWriter write = new PrintWriter(drugsFileName)) {
