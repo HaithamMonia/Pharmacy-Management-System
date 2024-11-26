@@ -49,7 +49,7 @@ public class Register {
     public void setPassword(String pw) {
         pw = pw.trim();
         while (true) {
-            if (pw.length() < 5) {
+            if (pw.length() < 3) {
                 System.out.println("ERROR Invalid Password!" +
                         "\n(A valid password consists of at least 5 characters)");
                 System.out.print("Enter your password: ");
@@ -73,6 +73,7 @@ public class Register {
         try (PrintWriter writer = new PrintWriter(new FileWriter(userFile, true))) {
             writer.println(un + ";" + pw);
             System.out.println("Registered Successfully");
+            startRegistration();
         } catch (Exception e) {
             System.out.println("Error: Registration failed. Try again.");
         }
