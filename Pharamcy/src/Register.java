@@ -73,6 +73,7 @@ public class Register {
         try (PrintWriter writer = new PrintWriter(new FileWriter(userFile, true))) {
             writer.println(un + ";" + pw);
             System.out.println("Registered Successfully");
+
         } catch (Exception e) {
             System.out.println("Error: Registration failed. Try again.");
         }
