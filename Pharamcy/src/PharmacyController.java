@@ -27,13 +27,13 @@ public class PharmacyController {
                         case 0 : System.exit(0);
                         case 1 : new Register().startRegistration();
 
-                        case 3 : {
+                        case 2 : {
                             // this to prevent leading the newline after pressing on enter after reading the option
                             scan.nextLine();
                             System.out.print("Enter your username: ");
-                            password = scan.nextLine().trim();
-                            System.out.print("Enter your password: ");
                             username = scan.nextLine().trim();
+                            System.out.print("Enter your password: ");
+                            password = scan.nextLine().trim();
                             Login loginTest = new Login(username, password);
                             // if the user logged in successfully he/she will be directed to the purchase page
                             if (loginTest.validateUser(username, password)) {
