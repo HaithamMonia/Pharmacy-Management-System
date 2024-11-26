@@ -27,7 +27,7 @@ public class PharmacyController {
                         case 0 : System.exit(0);
                         case 1 : new Register().startRegistration();
 
-                        case 2 : {
+                        case 3 : {
                             // this to prevent leading the newline after pressing on enter after reading the option
                             scan.nextLine();
                             System.out.print("Enter your username: ");
