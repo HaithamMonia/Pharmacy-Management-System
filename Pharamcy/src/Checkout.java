@@ -53,7 +53,7 @@ public class Checkout {
                 drug = line.split(";"); // Split line into an array of drug properties
 
                 // Check if the username matches the one passed as argument
-                if (drug[0].equalsIgnoreCase("Ali")) {
+                if (drug[0].equalsIgnoreCase(username)) {
                     drugName = drug[1];
                     price = Double.parseDouble(drug[2]);
                     quantity = Integer.parseInt(drug[3]);
@@ -63,7 +63,7 @@ public class Checkout {
                     checkoutList.add(new Drug(drugName, price, quantity));
                     System.out.println(lineNum + "- " + drugName + ":");
                     System.out.println("Quantity: " + quantity);
-                    System.out.println("Cost: " + (price + quantity));
+                    System.out.println("Cost: " + (price * quantity));
                     lineNum++;
                 }
             }

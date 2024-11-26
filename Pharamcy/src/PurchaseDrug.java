@@ -22,7 +22,7 @@ public class PurchaseDrug {
     // This method displays available drugs in the pharmacy
     public void viewDrugs() {
         drugsAvailableList.clear(); // Clear previous data before loading new
-        try (Scanner fileScanner = new Scanner(new File("durg.txt"))) {
+        try (Scanner fileScanner = new Scanner(new File(drugsFileName))) {
             // Check if file is empty
             if (!fileScanner.hasNextLine()) {
                 System.out.println("No Drugs Found");
@@ -36,7 +36,7 @@ public class PurchaseDrug {
                 System.out.println(lineNum + "- " + line);
 
                 // Create a new Drug object from line data and add it to the list
-                Drug d = new Drug(drug[1], Double.parseDouble(drug[2]), Integer.parseInt(drug[3]));
+                Drug d = new Drug(drug[0], Double.parseDouble(drug[1]), Integer.parseInt(drug[2]));
                 drugsAvailableList.add(d);
                 lineNum++;
             }
